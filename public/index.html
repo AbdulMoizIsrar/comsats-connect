@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMSATS Connect</title>
+<style>
+:root{
+  --ink:#10243a; --navy:#0f2a43; --navy2:#173a5b; --blue:#1c5d99; --mist:#eef3f7; --paper:#fbfcfd;
+  --line:#d9e2ea; --amber:#f0b429; --amberd:#7a5600; --green:#2e9e6b; --red:#b3392f; --muted:#5d7287;
+  --r-admin:#7b2d8e; --r-hod:#b3392f; --r-faculty:#1c5d99; --r-student:#2e7d5b; --r-staff:#8a6d1f;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:15px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);background:var(--mist)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.hidden{display:none!important}
+
+/* ---------- login ---------- */
+#login{min-height:100%;display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,460px)}
+.brand{background:var(--navy);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.brand h1{font:700 44px/1.05 Georgia,"Times New Roman",serif;margin:0;letter-spacing:-.5px}
+.brand p{margin:0;color:#b9cce0;max-width:42ch}
+.rules{margin-top:12px;display:grid;gap:8px;color:#d6e3f0;font-size:14px;max-width:48ch}
+.rules div{padding-left:14px;border-left:3px solid var(--amber)}
+.loginbox{background:var(--paper);padding:40px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.loginbox h2{margin:0;font-size:22px}
+label{display:grid;gap:4px;font-weight:600;font-size:13px;color:var(--muted)}
+input,select,textarea{border:1px solid var(--line);border-radius:6px;padding:9px 10px;background:#fff;width:100%}
+.btn{border:0;border-radius:6px;padding:10px 16px;background:var(--blue);color:#fff;font-weight:600}
+.btn:hover{background:var(--navy2)}
+.btn.ghost{background:transparent;color:var(--blue);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--mist)}
+.btn.danger{background:var(--red)}
+.btn.small{padding:4px 9px;font-size:12.5px}
+.demo{display:flex;flex-wrap:wrap;gap:6px}
+.demo button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;font-size:12.5px}
+.demo button:hover{border-color:var(--blue)}
+.err{color:var(--red);min-height:20px;font-size:13.5px}
+
+/* ---------- app shell ---------- */
+#app{height:100%;display:grid;grid-template-columns:320px 1fr}
+aside{background:var(--navy);color:#e6eef6;display:flex;flex-direction:column;min-height:0}
+.me{padding:16px;border-bottom:1px solid #ffffff22;display:flex;gap:10px;align-items:center}
+.me b{display:block;font-size:14.5px}
+.me small{color:#9fb6cc}
+.me .btn{margin-left:auto}
+.tabs{display:flex;border-bottom:1px solid #ffffff22}
+.tabs button{flex:1;background:none;border:0;color:#9fb6cc;padding:11px;border-bottom:3px solid transparent}
+.tabs button.on{color:#fff;border-color:var(--amber);font-weight:600}
+.tools{padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap}
+.tools .btn{background:#ffffff1a;font-size:13px;padding:6px 10px}
+.tools .btn:hover{background:#ffffff33}
+.list{overflow:auto;flex:1;padding:4px 8px 16px}
+.sect{padding:12px 8px 4px;color:#8ba5be;font-size:12.5px;font-weight:600}
+.item{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;color:inherit;padding:9px 10px;border-radius:8px}
+.item:hover{background:#ffffff14}
+.item.on{background:#ffffff26}
+.item .t{flex:1;min-width:0}
+.item .t span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .t small{color:#8ba5be;font-size:12px}
+.badge{background:var(--amber);color:#3b2a00;border-radius:999px;font-size:12px;font-weight:700;padding:0 7px;min-width:20px;text-align:center}
+.ava{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none;position:relative}
+.ava.g{border-radius:9px;background:var(--navy2);border:1px solid #ffffff33}
+.dot{position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--navy)}
+.role{font-size:11.5px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;vertical-align:1px}
+
+main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--paper)}
+.empty{margin:auto;text-align:center;color:var(--muted);padding:24px;max-width:46ch}
+.head{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;background:#fff}
+.head h3{margin:0;font-size:16.5px}
+.head small{color:var(--muted)}
+.head .grow{flex:1;min-width:0}
+.pill{font-size:12px;border-radius:999px;padding:2px 9px;background:var(--mist);border:1px solid var(--line);color:var(--muted)}
+.pill.ro{background:#fff4d6;border-color:#f0d58a;color:var(--amberd)}
+#msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:min(620px,82%);padding:8px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);align-self:flex-start;overflow-wrap:anywhere}
+.m.mine{align-self:flex-end;background:#dcebf8;border-color:#b8d3ea}
+.m .who{font-size:12.5px;font-weight:700;margin-bottom:2px}
+.m .ts{font-size:11px;color:var(--muted);margin-left:8px;font-weight:400}
+.sys{align-self:center;font-size:12.5px;color:var(--muted)}
+#typing{height:20px;padding:0 20px;font-size:12.5px;color:var(--muted)}
+.composer{border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px;background:#fff}
+.composer input{flex:1}
+.locked{padding:14px 18px;text-align:center;color:var(--amberd);background:#fff4d6;border-top:1px solid #f0d58a;font-size:14px}
+
+/* ---------- panels ---------- */
+.overlay{position:fixed;inset:0;background:#0f2a4399;display:grid;place-items:center;padding:16px;z-index:10}
+.modal{background:#fff;border-radius:10px;width:min(560px,100%);max-height:92vh;overflow:auto;padding:22px;display:grid;gap:12px}
+.modal h3{margin:0;font-size:19px}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px}
+.checks label{display:flex;gap:6px;align-items:center;font-weight:500;color:var(--ink);font-size:14px}
+.checks input{width:auto}
+.pick{max-height:170px;overflow:auto;border:1px solid var(--line);border-radius:6px;padding:6px 10px;display:grid;gap:2px}
+.mem{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--mist)}
+.mem .grow{flex:1;min-width:0}
+.note{font-size:13px;color:var(--muted)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;z-index:20;max-width:90vw}
+#back{display:none}
+@media(max-width:820px){
+  #login{grid-template-columns:1fr}.brand{padding:28px}.brand h1{font-size:32px}
+  #app{grid-template-columns:1fr}
+  #app.chat aside{display:none}#app:not(.chat) main{display:none}
+  #back{display:inline-block}
+}
+@media(prefers-reduced-motion:no-preference){.m{animation:pop .15s ease-out}@keyframes pop{from{opacity:.4;transform:translateY(3px)}}}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <div class="brand">
+    <h1>COMSATS<br>Connect</h1>
+    <p>Messaging for the Islamabad campus. Every group has a rulebook: who can join, and who can speak.</p>
+    <div class="rules">
+      <div>Notices and department channels are read-only for students.</div>
+      <div>Course groups belong to one department and one instructor.</div>
+      <div>Students reach faculty only through a shared course or group.</div>
+      <div>Only the admin office can add new users.</div>
+    </div>
+  </div>
+  <div class="loginbox">
+    <h2>Sign in</h2>
+    <label>Registration / employee ID<input id="lid" autocomplete="username" placeholder="FA23-BCS-001"></label>
+    <label>Password<input id="lpw" type="password" autocomplete="current-password"></label>
+    <div class="err" id="lerr"></div>
+    <button class="btn" id="lbtn">Sign in</button>
+    <div class="note">Demo accounts (password <b>123</b>). Open several tabs to chat as different people.</div>
+    <div class="demo" id="demo"></div>
+  </div>
+</section>
+
+<div id="app" class="hidden">
+  <aside>
+    <div class="me" id="me"></div>
+    <div class="tabs"><button id="tg" class="on">Groups</button><button id="tp">People</button></div>
+    <div class="tools" id="tools"></div>
+    <div class="list" id="list"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div id="modal-root"></div>
+<div id="toast" class="hidden" role="status"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const ROLE_COLOR = {admin:'var(--r-admin)',hod:'var(--r-hod)',faculty:'var(--r-faculty)',student:'var(--r-student)',staff:'var(--r-staff)'};
+const ROLE_LABEL = {admin:'Admin',hod:'HoD',faculty:'Faculty',student:'Student',staff:'Staff'};
+
+// tiny DOM helper -> everything goes through textContent, so user text can never inject HTML
+function h(tag, attrs, ...kids){
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})){
+    if (k==='class') e.className=v; else if (k.startsWith('on')) e.addEventListener(k.slice(2),v);
+    else if (v===true) e.setAttribute(k,''); else if (v!==false && v!=null) e.setAttribute(k,v);
+  }
+  for (const k of kids.flat()) if (k!=null && k!==false) e.append(k.nodeType?k:document.createTextNode(k));
+  return e;
+}
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.remove('hidden'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.add('hidden'),3500); }
+const initials = n => n.replace(/\(.*\)/,'').trim().split(/\s+/).filter(w=>!/^(dr\.|mr\.|ms\.)$/i.test(w)).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const dmRoom = (a,b)=>'dm:'+[a,b].sort().join('|');
+const roleTag = r => h('span',{class:'role',style:'background:'+ROLE_COLOR[r]},ROLE_LABEL[r]);
+
+let socket, S = {me:null,groups:[],contacts:[],directory:[],online:new Set(),tab:'groups',active:null};
+const msgs = new Map(), unread = new Map();
+let typingTimer;
+
+/* ---------------- login ---------------- */
+const DEMO = [['ADM-001','Admin'],['EMP-100','HoD CS'],['EMP-201','Faculty CS'],['FA23-BCS-001','Student CS'],['FA23-BCS-002','Student CS 2'],['FA23-BEE-001','Student EE'],['STF-01','Transport']];
+DEMO.forEach(([id,l])=>$('#demo').append(h('button',{onclick:()=>{$('#lid').value=id;$('#lpw').value='123';login();}},l)));
+$('#lbtn').onclick=login;
+$('#lpw').addEventListener('keydown',e=>e.key==='Enter'&&login());
+
+function login(){
+  $('#lerr').textContent='';
+  if (socket) socket.disconnect();
+  socket = io({auth:{id:$('#lid').value,password:$('#lpw').value}});
+  socket.on('connect_error',e=>{ $('#lerr').textContent=e.message; });
+  socket.on('connect',()=>{ $('#login').classList.add('hidden'); $('#app').classList.remove('hidden'); });
+  socket.on('state',onState);
+  socket.on('presence',ids=>{S.online=new Set(ids);renderList();renderHead();});
+  socket.on('message',onMessage);
+  socket.on('typing',onTyping);
+  socket.on('disconnect',()=>toast('Disconnected — trying to reconnect…'));
+}
+function logout(){ socket.disconnect(); location.reload(); }
+const call=(ev,data,cb)=>socket.emit(ev,data,res=>{ if(res&&res.error) toast(res.error); else cb&&cb(res); });
+
+/* ---------------- state + sidebar ---------------- */
+function onState(st){
+  Object.assign(S,st);
+  if (S.active?.kind==='group' && !S.groups.find(g=>g.id===S.active.id)) S.active=null;
+  renderMe(); renderTools(); renderList(); renderMain(false);
+  const ov=$('#modal-root').firstChild; if (ov && ov.dataset.manage) openManage(ov.dataset.manage);
+}
+function renderMe(){
+  const m=S.me;
+  $('#me').replaceChildren(
+    h('div',{class:'ava',style:'background:'+ROLE_COLOR[m.role]},initials(m.name)),
+    h('div',{},h('b',{},m.name),h('small',{},m.id+' · '+m.dept+' · '),roleTag(m.role)),
+    h('button',{class:'btn small ghost',style:'color:#fff;border-color:#ffffff44',onclick:logout},'Sign out'));
+}
+function renderTools(){
+  const t=$('#tools'); t.replaceChildren();
+  if (['admin','hod','faculty'].includes(S.me.role)) t.append(h('button',{class:'btn',onclick:openCreateGroup},'+ New group'));
+  if (S.me.role==='admin') t.append(h('button',{class:'btn',onclick:openCreateUser},'+ Add user'));
+}
+$('#tg').onclick=()=>{S.tab='groups';$('#tg').classList.add('on');$('#tp').classList.remove('on');renderList();};
+$('#tp').onclick=()=>{S.tab='people';$('#tp').classList.add('on');$('#tg').classList.remove('on');renderList();};
+
+function renderList(){
+  const L=$('#list'); L.replaceChildren();
+  if (!S.me) return;
+  if (S.tab==='groups'){
+    const order=[['Notices','announcement'],['Courses','course'],['Departments & faculty','faculty'],['Discussions & societies',['discussion','society']]];
+    for (const [title,types] of order){
+      const gs=S.groups.filter(g=>[].concat(types).includes(g.type));
+      if (!gs.length) continue;
+      L.append(h('div',{class:'sect'},title));
+      gs.forEach(g=>L.append(groupItem(g)));
+    }
+    if (!S.groups.length) L.append(h('div',{class:'sect'},'You are not in any groups yet.'));
+  } else {
+    L.append(h('div',{class:'sect'},'People you may message'));
+    S.contacts.forEach(u=>{
+      const room=dmRoom(S.me.id,u.id), n=unread.get(room);
+      L.append(h('button',{class:'item'+(S.active?.room===room?' on':''),onclick:()=>openDM(u)},
+        h('div',{class:'ava',style:'background:'+ROLE_COLOR[u.role]},initials(u.name),S.online.has(u.id)&&h('i',{class:'dot'})),
+        h('div',{class:'t'},h('span',{},u.name),h('small',{},ROLE_LABEL[u.role]+' · '+u.dept)),
+        n&&h('span',{class:'badge'},n)));
+    });
+  }
+}
+function groupItem(g){
+  const room='group:'+g.id, n=unread.get(room);
+  return h('button',{class:'item'+(S.active?.room===room?' on':''),onclick:()=>openGroup(g)},
+    h('div',{class:'ava g'},initials(g.name.replace(/[^A-Za-z ]/g,' '))),
+    h('div',{class:'t'},h('span',{},g.name),h('small',{},g.members.length+' members'+(g.canPost?'':' · read-only'))),
+    n&&h('span',{class:'badge'},n));
+}
+
+/* ---------------- chat ---------------- */
+function openGroup(g){ S.active={kind:'group',id:g.id,room:'group:'+g.id}; loadActive(); }
+function openDM(u){ S.active={kind:'dm',id:u.id,room:dmRoom(S.me.id,u.id)}; loadActive(); }
+function loadActive(){
+  unread.delete(S.active.room);
+  $('#app').classList.add('chat');
+  const ev=S.active.kind==='group'?'group:history':'dm:history';
+  call(ev,S.active.id,r=>{ msgs.set(S.active.room,r.messages); renderMain(true); renderList(); });
+  renderMain(true); renderList();
+}
+const activeGroup=()=>S.active?.kind==='group'?S.groups.find(g=>g.id===S.active.id):null;
+const activePeer=()=>S.active?.kind==='dm'?S.contacts.find(u=>u.id===S.active.id):null;
+
+function renderMain(full){
+  const M=$('#main');
+  if (!S.active){
+    $('#app').classList.remove('chat');
+    M.replaceChildren(h('div',{class:'empty'},h('h3',{},'Pick a group or a person'),h('p',{},'Groups you can read are on the left. A yellow “read-only” tag means only certain roles can post there.')));
+    return;
+  }
+  if (!full && $('#msgs')){ renderHead(); renderComposer(); return; }
+  M.replaceChildren(h('div',{class:'head',id:'head'}),h('div',{id:'msgs'}),h('div',{id:'typing'}),h('div',{id:'foot'}));
+  renderHead(); renderComposer(); renderMsgs();
+}
+function renderHead(){
+  const hd=$('#head'); if(!hd||!S.active) return;
+  const g=activeGroup(), p=activePeer();
+  hd.replaceChildren(h('button',{id:'back',class:'btn small ghost',onclick:()=>{S.active=null;renderMain(true);}},'‹ Back'));
+  if (g){
+    hd.append(h('div',{class:'grow'},h('h3',{},g.name),h('small',{},g.dept?g.dept+' department':'University-wide')),
+      h('span',{class:'pill'},g.type), (!g.canPost?h('span',{class:'pill ro'},'read-only'):''),
+      h('button',{class:'btn small ghost',onclick:()=>openManage(g.id)},g.canManage?'Manage':'Members'));
+  } else if (p){
+    hd.append(h('div',{class:'grow'},h('h3',{},p.name),h('small',{},ROLE_LABEL[p.role]+' · '+p.dept+(S.online.has(p.id)?' · online':' · offline'))),h('span',{class:'pill'},'direct message'));
+  }
+}
+function renderComposer(){
+  const f=$('#foot'); if(!f) return;
+  const g=activeGroup();
+  if (g && !g.canPost){
+    const who=g.postRoles.map(r=>ROLE_LABEL[r]).join(', ');
+    f.replaceChildren(h('div',{class:'locked'},g.muted.includes(S.me.id)?'You have been muted in this group by a moderator.':'Read-only for you. Posting is limited to: '+who+'.'));
+    return;
+  }
+  if (f.querySelector('input')) return;
+  const inp=h('input',{id:'txt',placeholder:'Write a message',maxlength:1000,autocomplete:'off'});
+  const send=()=>{
+    const text=inp.value.trim(); if(!text) return;
+    const payload=S.active.kind==='group'?{groupId:S.active.id,text}:{to:S.active.id,text};
+    call(S.active.kind==='group'?'group:message':'dm:message',payload,()=>{inp.value='';});
+  };
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') send();
+    else socket.volatile.emit('typing',S.active.kind==='group'?{groupId:S.active.id}:{to:S.active.id}); });
+  f.replaceChildren(h('div',{class:'composer'},inp,h('button',{class:'btn',onclick:send},'Send')));
+  inp.focus();
+}
+function msgEl(m){
+  const mine=m.from.id===S.me.id, t=new Date(m.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  return h('div',{class:'m'+(mine?' mine':'')},
+    !mine&&h('div',{class:'who',style:'color:'+ROLE_COLOR[m.from.role]},m.from.name,' ',roleTag(m.from.role)),
+    m.text,h('span',{class:'ts'},t));
+}
+function renderMsgs(){
+  const box=$('#msgs'); if(!box) return;
+  const list=msgs.get(S.active.room)||[];
+  box.replaceChildren(...(list.length?list.map(msgEl):[h('div',{class:'sys'},'No messages yet.')]));
+  box.scrollTop=box.scrollHeight;
+}
+function onMessage(m){
+  const list=msgs.get(m.room);
+  if (list) list.push(m);
+  if (S.active?.room===m.room){ if(!list) return; const box=$('#msgs'); if(list.length===1) box.replaceChildren(); box.append(msgEl(m)); box.scrollTop=box.scrollHeight; $('#typing').textContent=''; }
+  else if (m.from.id!==S.me.id){ unread.set(m.room,(unread.get(m.room)||0)+1); renderList(); }
+}
+function onTyping({user,room}){
+  if (S.active?.room!==room) return;
+  $('#typing').textContent=user+' is typing…';
+  clearTimeout(typingTimer); typingTimer=setTimeout(()=>{const t=$('#typing'); if(t) t.textContent='';},1800);
+}
+
+/* ---------------- modals ---------------- */
+function modal(content,dataset){
+  const close=()=>$('#modal-root').replaceChildren();
+  const ov=h('div',{class:'overlay',onclick:e=>e.target===ov&&close()},h('div',{class:'modal',role:'dialog'},content(close)));
+  Object.assign(ov.dataset,dataset||{});
+  $('#modal-root').replaceChildren(ov);
+}
+const roleChecks=(name,sel,locked)=>h('div',{class:'checks'},S.roles.map(r=>
+  h('label',{},h('input',{type:'checkbox',name,value:r,checked:sel.includes(r),disabled:locked}),ROLE_LABEL[r])));
+const checked=(root,name)=>[...root.querySelectorAll(`input[name=${name}]:checked`)].map(i=>i.value);
+
+function openCreateUser(){
+  modal(close=>{
+    const f=h('div',{style:'display:grid;gap:12px'},
+      h('h3',{},'Add a user'),
+      h('div',{class:'row'},h('label',{},'ID',h('input',{id:'nu-id',placeholder:'FA24-BCS-010'})),h('label',{},'Password',h('input',{id:'nu-pw',value:'123'}))),
+      h('label',{},'Full name',h('input',{id:'nu-name'})),
+      h('div',{class:'row'},
+        h('label',{},'Role',h('select',{id:'nu-role'},S.roles.map(r=>h('option',{value:r},ROLE_LABEL[r])))),
+        h('label',{},'Department',h('select',{id:'nu-dept'},S.depts.map(d=>h('option',{value:d},d))))),
+      h('div',{class:'note'},'New users are added to the university-wide channels their role is allowed to join. Add them to department or course groups afterwards.'),
+      h('div',{class:'row'},h('button',{class:'btn ghost',onclick:close},'Cancel'),h('button',{class:'btn',onclick:()=>{
+        call('user:create',{id:$('#nu-id').value,name:$('#nu-name').value,password:$('#nu-pw').value,role:$('#nu-role').value,dept:$('#nu-dept').value},()=>{toast('User added');close();});
+      }},'Add user')));
+    return f;
+  });
+}
+
+const PRESETS={ // sensible role defaults per group type
+  announcement:{allowed:['admin','hod','faculty','student','staff'],post:['hod']},
+  course:{allowed:['faculty','student'],post:['faculty','student']},
+  discussion:{allowed:['student','faculty'],post:['student','faculty']},
+  faculty:{allowed:['hod','faculty'],post:['hod','faculty']},
+  society:{allowed:['student','faculty'],post:['student','faculty']},
+};
+function openCreateGroup(){
+  const me=S.me, isAdmin=me.role==='admin', isFac=me.role==='faculty';
+  modal(close=>{
+    const types=isFac?['course','discussion']:Object.keys(PRESETS);
+    const root=h('div',{style:'display:grid;gap:12px'});
+    const allowedBox=h('div'), postBox=h('div'), pickBox=h('div',{class:'pick'});
+    const typeSel=h('select',{id:'ng-type'},types.map(t=>h('option',{value:t},t)));
+    const deptSel=h('select',{id:'ng-dept',disabled:!isAdmin},
+      isAdmin?[h('option',{value:''},'University-wide'),...S.depts.map(d=>h('option',{value:d},d))]:[h('option',{value:me.dept},me.dept)]);
+    function draw(){
+      const p=PRESETS[typeSel.value];
+      allowedBox.replaceChildren(roleChecks('allowed',isFac?['faculty','student']:p.allowed,isFac));
+      postBox.replaceChildren(roleChecks('post',p.post,false));
+      drawPick();
+    }
+    function drawPick(){
+      const allowed=checked(allowedBox,'allowed'), dept=deptSel.value;
+      const cand=S.directory.filter(u=>allowed.includes(u.role)&&(!dept||u.dept===dept||u.role==='admin'));
+      pickBox.replaceChildren(...(cand.length?cand.map(u=>h('label',{class:'checks'},h('span',{style:'display:flex;gap:6px;align-items:center;font-weight:500;color:var(--ink)'},
+        h('input',{type:'checkbox',name:'mem',value:u.id,style:'width:auto'}),u.name,' ',roleTag(u.role),' ',h('small',{},u.dept)))):[h('div',{class:'note'},'No one matches these boundaries.')]));
+    }
+    typeSel.onchange=draw; deptSel.onchange=drawPick; allowedBox.addEventListener('change',drawPick);
+    root.append(h('h3',{},'Create a group'),
+      h('label',{},'Group name',h('input',{id:'ng-name',placeholder:'e.g. CSC310 Operating Systems (BCS-5A)'})),
+      h('div',{class:'row'},h('label',{},'Type',typeSel),h('label',{},'Department limit',deptSel)),
+      h('label',{},'Who may join this group?',allowedBox),
+      h('label',{},'Who may post? (everyone else reads only)',postBox),
+      h('div',{class:'note'},isFac?'As faculty you can create course and discussion groups for your own department. You become the group owner and can always post.':isAdmin?'The group owner and admin can always post.':'HoDs create groups inside their own department.'),
+      h('label',{},'Add members now',pickBox),
+      h('div',{class:'row'},h('button',{class:'btn ghost',onclick:close},'Cancel'),h('button',{class:'btn',onclick:()=>{
+        call('group:create',{name:$('#ng-name').value,type:typeSel.value,dept:deptSel.value||null,
+          allowedRoles:checked(allowedBox,'allowed'),postRoles:checked(postBox,'post'),members:checked(pickBox,'mem')},
+          r=>{ toast(r.skipped?.length?'Created. Not eligible: '+r.skipped.join(', '):'Group created'); close(); });
+      }},'Create group')));
+    draw();
+    return root;
+  });
+}
+
+function openManage(id){
+  const g=S.groups.find(x=>x.id===id); if(!g){ $('#modal-root').replaceChildren(); return; }
+  modal(close=>{
+    const cand=S.directory.filter(u=>g.allowedRoles.includes(u.role)&&(!g.dept||u.dept===g.dept||u.role==='admin')&&!g.members.some(m=>m.id===u.id));
+    const sel=h('select',{id:'add-sel'},cand.map(u=>h('option',{value:u.id},`${u.name} (${ROLE_LABEL[u.role]}, ${u.dept})`)));
+    return h('div',{style:'display:grid;gap:12px'},
+      h('h3',{},g.name),
+      h('div',{class:'note'},
+        'Who can join: '+g.allowedRoles.map(r=>ROLE_LABEL[r]).join(', ')+(g.dept?' of '+g.dept+' only':'')+'.  Who can post: '+(g.postRoles.map(r=>ROLE_LABEL[r]).join(', ')||'owner only')+'.'),
+      h('div',{},g.members.map(m=>h('div',{class:'mem'},
+        h('div',{class:'ava',style:'background:'+ROLE_COLOR[m.role]},initials(m.name)),
+        h('div',{class:'grow'},m.name,' ',roleTag(m.role),m.id===g.ownerId&&h('small',{},' owner'),g.muted.includes(m.id)&&h('small',{},' muted')),
+        g.canManage&&m.id!==g.ownerId&&h('button',{class:'btn small ghost',onclick:()=>call('group:toggleMute',{groupId:g.id,userId:m.id})},g.muted.includes(m.id)?'Unmute':'Mute'),
+        g.canManage&&m.id!==g.ownerId&&h('button',{class:'btn small ghost',onclick:()=>call('group:removeMember',{groupId:g.id,userId:m.id})},'Remove')))),
+      g.canManage&&h('div',{},h('label',{},'Add a member (only eligible people are listed)',
+        cand.length?h('div',{class:'row'},sel,h('button',{class:'btn',style:'flex:none',onclick:()=>call('group:addMember',{groupId:g.id,userId:sel.value})},'Add')):h('div',{class:'note'},'Everyone eligible is already in this group.'))),
+      h('div',{class:'row'},
+        g.canManage&&h('button',{class:'btn danger',onclick:()=>{ if(confirm('Delete this group and its messages?')) call('group:delete',g.id,()=>{S.active=null;close();}); }},'Delete group'),
+        h('button',{class:'btn ghost',onclick:close},'Close')));
+  },{manage:g.id});
+}
+</script>
+</body>
+</html>
